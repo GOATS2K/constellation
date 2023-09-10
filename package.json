@@ -1,11 +1,16 @@
 {
   "name": "constellation",
   "module": "index.ts",
-  "type": "module",
   "devDependencies": {
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@octokit/rest": "^20.0.1",
+    "@octokit/types": "^11.1.0",
+    "elysia": "^0.6.20"
   }
 }
