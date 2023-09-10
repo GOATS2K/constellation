@@ -2,7 +2,8 @@
   "name": "constellation",
   "module": "index.ts",
   "scripts": {
-    "create-token": "bun run scripts/create-token.ts"
+    "create-token": "bun run scripts/create-token.ts",
+    "start": "bun run index.ts"
   },
   "devDependencies": {
     "bun-types": "latest"
