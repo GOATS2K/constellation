@@ -1,6 +1,10 @@
 {
   "name": "constellation",
   "module": "index.ts",
+  "scripts": {
+    "create-token": "bun run scripts/create-token.ts",
+    "start": "bun run src/index.ts"
+  },
   "devDependencies": {
     "bun-types": "latest"
   },
@@ -9,8 +13,11 @@
   },
   "type": "module",
   "dependencies": {
+    "@elysiajs/bearer": "^0.6.0",
+    "@elysiajs/jwt": "^0.6.3",
     "@octokit/rest": "^20.0.1",
     "@octokit/types": "^11.1.0",
-    "elysia": "^0.6.20"
+    "elysia": "^0.6.20",
+    "jose": "^4.14.6"
   }
 }
