@@ -3,7 +3,7 @@
   "module": "index.ts",
   "scripts": {
     "create-token": "bun run scripts/create-token.ts",
-    "start": "bun run index.ts"
+    "start": "bun run src/index.ts"
   },
   "devDependencies": {
     "bun-types": "latest"
