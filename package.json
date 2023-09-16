@@ -1,6 +1,7 @@
 {
   "name": "constellation",
   "module": "index.ts",
+  "version": "0.1.0",
   "scripts": {
     "create-token": "bun run scripts/create-token.ts",
     "start": "bun run src/index.ts"
