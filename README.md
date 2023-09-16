@@ -29,9 +29,27 @@ Using either a `.env` file in Constellation's root directory, or exporting varia
 
 ## Installation
 
+### Local
+
 ```bash
 bun install
 ```
+
+### Docker
+
+```yml
+services:
+  constellation:
+    container_name: constellation
+    image: goats2k/constellation:0.1.0
+    restart: unless-stopped
+    environment:
+      - GITHUB_TOKEN=<your-pat-here>
+      - JWT_SECRET_KEY=<your-secret-key-here>
+    ports:
+      - 127.0.0.1:8000:8000
+```
+
 
 ## Usage
 
@@ -47,6 +65,12 @@ To generate a token pointing to a repository, run the following command:
 bun run create-token <repository-name>
 ```
 
+Alternatively, if running via Docker, after setting up the image:
+
+```bash
+docker exec -it constellation bun run create-token <repository-name>
+```
+
 Which will output the following:
 
 ```text
@@ -55,8 +79,15 @@ JWT token for <repository-name>: <your token here>
 
 ## Running Constellation
 
+### Local
+
 ```bash
 bun start
+```
+
+### Docker (if using the supplied Compose file)
+```
+docker compose up -d
 ```
 
 ## Getting releases
