@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { ReleaseDto } from './dto/release-dto';
 
 const rs = new ReleaseService(new Octokit({ auth: validateEnvironmentVariable("GITHUB_TOKEN") }));
+
 const app = new Hono();
 app.use('*', jwt({
     secret: validateEnvironmentVariable("JWT_SECRET_KEY"),
@@ -37,7 +38,11 @@ app.get("/versions/:version",
     async (c) => {
         const payload = c.get("jwtPayload")
         const version = c.req.param("version")
-        const { arch, platform } = c.req.valid("query");
+        const { arch, platform } = c.req.valid("query")
+        const userAgent = c.req.header("user-agent")
+        const forwardedFor = c.req.header("X-Forwarded-For")
+
+        console.log(`[${new Date().toISOString()}] [${forwardedFor}] User agent ${userAgent} requested version ${version} for ${arch}/${platform}`)
 
         try {
             const releases = await rs.getRelease(payload.repository,
