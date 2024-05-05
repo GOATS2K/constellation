@@ -4,5 +4,6 @@ export interface ReleaseDto {
   repoName: string;
   version: string;
   description: string;
+  prerelease: boolean;
   assets: ReleaseAssetDto[];
 }
