@@ -41,7 +41,7 @@ bun install
 services:
   constellation:
     container_name: constellation
-    image: goats2k/constellation:0.1.0
+    image: goats2k/constellation:0.2.0
     restart: unless-stopped
     environment:
       - GITHUB_TOKEN=<your-pat-here>
@@ -102,5 +102,7 @@ Constellation exposes the following endpoints for updates:
 
 - GET `/versions`
   - This returns every release available in your repository.
+- GET `/versions?includePrerelease=true`
+  - This returns every release, including prereleases, available in your repository.
 - GET `/versions/<version>?platform=<platform>&arch=<arch>`
   - This returns the actual release with a download link.
