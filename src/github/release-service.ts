@@ -115,6 +115,7 @@ export class ReleaseService {
       description: release.body,
       version: release.tag_name,
       assets: release.assets.map((asset) => this.createReleaseAsset(asset)),
+      prerelease: release.prerelease
     } as ReleaseDto;
   }
 
