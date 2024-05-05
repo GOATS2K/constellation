@@ -39,12 +39,20 @@ app.get("/versions/:version",
         const version = c.req.param("version")
         const { arch, platform } = c.req.valid("query");
 
-        const releases = await rs.getRelease(payload.repository,
-            correctVersionNumber(version),
-            correctPlatformName(platform),
-            correctArchitecture(arch))
+        try {
+            const releases = await rs.getRelease(payload.repository,
+                correctVersionNumber(version),
+                correctPlatformName(platform),
+                correctArchitecture(arch))
 
-        return c.json(releases)
+            return c.json(releases)
+        } catch (error) {
+            const e = error as Error
+            return c.json({
+                error: true,
+                message: e.message
+            }, 404)
+        }
     })
 
 
