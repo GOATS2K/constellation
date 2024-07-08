@@ -1,10 +1,10 @@
 export const validateEnvironmentVariable = (
-  environmentVariable: string
+  environmentVariable: string,
 ): string => {
   const value = Bun.env[environmentVariable];
   if (!value || value.length == 0) {
     throw new Error(
-      `Environment variable ${environmentVariable} cannot be empty.`
+      `Environment variable ${environmentVariable} cannot be empty.`,
     );
   }
   return value;

@@ -1,23 +1,25 @@
 {
   "name": "constellation",
   "module": "index.ts",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "create-token": "bun run scripts/create-token.ts",
     "start": "bun run src/index.ts"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "prettier": "^3.3.2"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.5.3"
   },
   "type": "module",
   "dependencies": {
     "@octokit/rest": "^20.1.1",
     "@octokit/types": "^11.1.0",
-    "hono": "^4.3.2",
-    "jose": "^4.14.6",
-    "zod": "^3.23.6"
+    "gitea-js": "^1.22.0",
+    "hono": "^4.4.12",
+    "jose": "^4.15.9",
+    "zod": "^3.23.8"
   }
 }
