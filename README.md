@@ -57,7 +57,7 @@ bun install
 services:
   constellation:
     container_name: constellation
-    image: goats2k/constellation:0.3.0
+    image: goats2k/constellation:0.3.1
     restart: unless-stopped
     environment:
       - GITHUB_TOKEN=<your-pat-here>
@@ -75,7 +75,7 @@ services:
 services:
   constellation:
     container_name: constellation
-    image: goats2k/constellation:0.3.0
+    image: goats2k/constellation:0.3.1
     restart: unless-stopped
     environment:
       - JWT_SECRET_KEY=<your-secret-key-here>
