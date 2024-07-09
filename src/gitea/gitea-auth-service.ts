@@ -1,5 +1,5 @@
 import path from "path";
-import os from "node:os"
+import os from "node:os";
 import { validateEnvironmentVariable } from "../util";
 
 export type GiteaCredentials = {
@@ -67,7 +67,7 @@ export class GiteaAuthService {
     this.storedCredentials = await this.loadCredentials();
   }
 
-  async getCredentials(code: string): Promise<GiteaCredentials | null> {
+  async login(code: string) {
     const clientId = validateEnvironmentVariable("GITEA_CLIENT_ID");
     const clientSecret = validateEnvironmentVariable("GITEA_CLIENT_SECRET");
     const giteaServer = validateEnvironmentVariable("GITEA_SERVER");
@@ -87,18 +87,15 @@ export class GiteaAuthService {
       body: JSON.stringify(requestBody),
       headers: { "Content-Type": "application/json" },
     });
-    console.log(resp);
     const body = await resp.json();
 
     if (!resp.ok) throw new Error(JSON.stringify(body));
 
     this.persistCredentials(body as GiteaCredentials);
-    this.storedCredentials = await this.loadCredentials();
-    return this.storedCredentials;
   }
 
   getDataDirectory(): string {
-    if (Bun.env.RUNNING_IN_DOCKER == "production") return "/data";
+    if (Bun.env.RUNNING_IN_DOCKER === "true") return "/data";
     return path.join(os.homedir(), ".config", "constellation");
   }
 
@@ -117,13 +114,16 @@ export class GiteaAuthService {
   }
 
   async loadCredentials(): Promise<GiteaCredentials | null> {
-    const filePath = path.join(this.getDataDirectory(), this.giteaCredentialFile)   
+    const filePath = path.join(
+      this.getDataDirectory(),
+      this.giteaCredentialFile,
+    );
     const credentialFile = Bun.file(filePath);
-    const fileExists = await credentialFile.exists()
+    const fileExists = await credentialFile.exists();
     if (!fileExists) {
       return null;
     }
 
-    return await credentialFile.json() as GiteaCredentials;
+    return (await credentialFile.json()) as GiteaCredentials;
   }
 }

@@ -1,5 +1,5 @@
 export type ReleaseStream = {
-    stream: ReadableStream,
-    fileName: string,
-    size: number,
-}
+  stream: ReadableStream;
+  fileName: string;
+  size: number;
+};

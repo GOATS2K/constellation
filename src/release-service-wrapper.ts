@@ -9,11 +9,20 @@ import { ReleaseDto } from "./dto/release-dto";
 import { ReleaseStream } from "./dto/release-stream";
 
 export class ReleaseService implements IReleaseService {
-  
-  async getReleaseAssetStream(repository: string, version: string, platform: string, arch: string): Promise<ReleaseStream> {
-    return await this.getActiveService().getReleaseAssetStream(repository, version, platform, arch);
+  async getReleaseAssetStream(
+    repository: string,
+    version: string,
+    platform: string,
+    arch: string,
+  ): Promise<ReleaseStream> {
+    return await this.getActiveService().getReleaseAssetStream(
+      repository,
+      version,
+      platform,
+      arch,
+    );
   }
-  
+
   getActiveService(): IReleaseService {
     if (Bun.env.GITHUB_TOKEN != null) {
       return new GithubReleaseService(

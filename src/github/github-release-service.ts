@@ -14,14 +14,19 @@ export class GithubReleaseService implements IReleaseService {
   constructor(client: Octokit) {
     this.client = client;
   }
-  async getReleaseAssetStream(repository: string, version: string, platform: string, arch: string): Promise<ReleaseStream> {
+  async getReleaseAssetStream(
+    repository: string,
+    version: string,
+    platform: string,
+    arch: string,
+  ): Promise<ReleaseStream> {
     const release = await this.getRelease(repository, version, platform, arch);
     const response = await fetch(release.url);
     return {
       fileName: release.fileName,
       size: release.size,
-      stream: response.body
-    } as ReleaseStream
+      stream: response.body,
+    } as ReleaseStream;
   }
 
   async getAssetsForVersion(

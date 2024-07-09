@@ -18,9 +18,21 @@ export class GiteaReleaseService implements IReleaseService {
   constructor(authService: GiteaAuthService) {
     this.authTokenService = authService;
   }
-  
-  async getReleaseAssetStream(repository: string, version: string, platform: string, arch: string): Promise<ReleaseStream> {
-    const { targetAsset, assetData } = await this.getGiteaAsset(repository, version, arch, platform);
+
+  async getReleaseAssetStream(
+    repository: string,
+    version: string,
+    platform: string,
+    arch: string,
+  ): Promise<ReleaseStream> {
+    // This can be optimized to get the attachement directly
+    // rather than going the roundabout way of re-getting the repo and then the attachment.
+    const { targetAsset, assetData } = await this.getGiteaAsset(
+      repository,
+      version,
+      arch,
+      platform,
+    );
     const url = assetData.browser_download_url;
     if (url == null)
       throw new Error("Download URL from Gitea came back as null.");
@@ -28,17 +40,17 @@ export class GiteaReleaseService implements IReleaseService {
     const accessToken = await this.authTokenService.getAccessToken();
     const response = await fetch(url.toString(), {
       headers: {
-        "Authorization": `token ${accessToken}`
-      }
+        Authorization: `token ${accessToken}`,
+      },
     });
     if (!response.ok)
-      throw new Error(`Failed to get stream: ${await response.text()}`)
+      throw new Error(`Failed to get stream: ${await response.text()}`);
 
     return {
       fileName: targetAsset.fileName,
       size: targetAsset.contentLength,
-      stream: response.body
-    } as ReleaseStream
+      stream: response.body,
+    } as ReleaseStream;
   }
 
   async createApiClient(): Promise<Api<SecurityDataType>> {
@@ -61,7 +73,7 @@ export class GiteaReleaseService implements IReleaseService {
     const owner = targetRepo.owner?.login!;
     const releasesResponse = await client.repos.repoListReleases(
       owner,
-      repository
+      repository,
     );
     const releaseList = releasesResponse.data;
     return releaseList.map((r) => this.createRelease(r, repository, owner));
@@ -73,19 +85,29 @@ export class GiteaReleaseService implements IReleaseService {
     platform: string,
     arch: string,
   ): Promise<ReleaseAssetDownloadDto> {
-    const { targetAsset } = await this.getGiteaAsset(repository, version, arch, platform);
+    const { targetAsset } = await this.getGiteaAsset(
+      repository,
+      version,
+      arch,
+      platform,
+    );
 
     return {
       arch: arch,
       fileName: targetAsset.fileName,
       size: targetAsset.contentLength,
       platform: targetAsset.platform,
-      url: `/download/${version}?arch=${arch}&platform=${platform}&download=true`,
+      url: `/download`,
       version: version,
     } as ReleaseAssetDownloadDto;
   }
 
-  private async getGiteaAsset(repository: string, version: string, arch: string, platform: string) {
+  private async getGiteaAsset(
+    repository: string,
+    version: string,
+    arch: string,
+    platform: string,
+  ) {
     const client = await this.createApiClient();
     const releases = await this.getReleasesForRepo(repository);
     const targetRelease = releases.find((r) => r.version === version);
@@ -94,10 +116,8 @@ export class GiteaReleaseService implements IReleaseService {
       throw new Error("Cannot find release.");
     }
 
-    console.log("Requesting release:", { arch, platform });
-
     const targetAsset = targetRelease.assets.find(
-      (r) => r.arch == arch && r.platform == platform
+      (r) => r.arch == arch && r.platform == platform,
     );
     if (targetAsset == null) throw new Error("Cannot find asset.");
 
@@ -105,7 +125,7 @@ export class GiteaReleaseService implements IReleaseService {
       targetRelease.owner,
       repository,
       targetRelease.id,
-      targetAsset.id
+      targetAsset.id,
     );
 
     const assetData = asset.data;

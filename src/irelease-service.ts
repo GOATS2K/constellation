@@ -10,8 +10,10 @@ export interface IReleaseService {
     arch: string,
   ): Promise<ReleaseAssetDownloadDto>;
   getReleasesForRepo(repository: string): Promise<ReleaseDto[]>;
-  getReleaseAssetStream(repository: string,
+  getReleaseAssetStream(
+    repository: string,
     version: string,
     platform: string,
-    arch: string): Promise<ReleaseStream>;
+    arch: string,
+  ): Promise<ReleaseStream>;
 }
