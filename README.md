@@ -84,6 +84,8 @@ services:
       - GITEA_CLIENT_SECRET=super-secret-client-id
     ports:
       - 127.0.0.1:8000:8000
+    volumes:
+      - "/home/goats2k/.container-data/constellation:/data"
 ```
 
 
