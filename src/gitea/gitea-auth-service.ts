@@ -67,11 +67,10 @@ export class GiteaAuthService {
     this.storedCredentials = await this.loadCredentials();
   }
 
-  async login(code: string) {
+  async login(code: string, redirectUri: string) {
     const clientId = validateEnvironmentVariable("GITEA_CLIENT_ID");
     const clientSecret = validateEnvironmentVariable("GITEA_CLIENT_SECRET");
     const giteaServer = validateEnvironmentVariable("GITEA_SERVER");
-    const redirectUri = validateEnvironmentVariable("GITEA_REDIRECT_URI");
     const requestUrl = `${giteaServer}/login/oauth/access_token`;
 
     const requestBody = {

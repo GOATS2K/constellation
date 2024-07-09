@@ -10,7 +10,6 @@ import {
 import { z } from "zod";
 import { ReleaseDto } from "./dto/release-dto";
 import { GiteaAuthService } from "./gitea/gitea-auth-service";
-import { giteaApi } from "gitea-js";
 import { ReleaseService } from "./release-service-wrapper";
 import { SignJWT } from "jose";
 import { ReleaseAssetDownloadDto } from "./dto/release-asset-download";
@@ -48,7 +47,10 @@ app.use(
 app.get("/gitea/auth", async (c) => {
   const giteaServer = validateEnvironmentVariable("GITEA_SERVER");
   const clientId = validateEnvironmentVariable("GITEA_CLIENT_ID");
-  const callbackUri = validateEnvironmentVariable("GITEA_REDIRECT_URI");
+  
+  const hostUrl = new URL(c.req.url);
+  const callbackUri = `${hostUrl.protocol}//${hostUrl.host}/gitea/callback`
+
   const giteaUrl = `${giteaServer}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${callbackUri}&response_type=code&state=`;
   return c.redirect(giteaUrl);
 });
@@ -76,7 +78,11 @@ app.get(
           403,
         );
       }
-      await authService.login(code);
+
+      const hostUrl = new URL(c.req.url);
+      const callbackUri = `${hostUrl.protocol}//${hostUrl.host}/gitea/callback`
+
+      await authService.login(code, callbackUri);
       return c.json({
         message: "Successfully logged in to Gitea!"
       })
@@ -84,7 +90,7 @@ app.get(
       return c.json({
         error: true,
         message: "Failed to get token from Gitea",
-        debug: JSON.parse((error as Error).message),
+        debug: (error as Error).message,
       });
     }
   },
