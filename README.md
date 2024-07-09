@@ -1,13 +1,14 @@
 # constellation
 
-Distribute your GitHub releases in your closed-source projects.
+Distribute CI-built releases via the platform that built them in your closed-source projects.
 
-Constellation works by querying GitHub to fetch releases created in your private projects.
+Constellation supports both Gitea and GitHub - but not at the same time.
 
 ## Requirements
 
 - [bun](https://bun.sh)
 - GitHub [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with read access to your repositories
+- Alternatively, a Gitea host + Oauth application client ID and secret
 
 ### Note about release names
 
@@ -18,14 +19,27 @@ $application_name-$version-$platform-$architecture
 constellation-v0.1.0-darwin-aarch64.zip
 ```
 
-*This will probably change in the future.*
-
 ## Configuration
 
 Using either a `.env` file in Constellation's root directory, or exporting variables using Docker or your favorite shell, set the following variables:
 
-- `GITHUB_TOKEN` - containing your private access token
 - `JWT_SECRET_KEY` - a strong key used to sign JWT tokens
+
+Below you will find environment variables that determine which source Constellation will look for releases in. GitHub will be checked first - then Gitea. If you leave out the GitHub token, Gitea will be used and vice versa.
+
+### GitHub
+- `GITHUB_TOKEN` - containing your private access token
+
+### Gitea
+- `GITEA_SERVER` - your Gitea server instance - e.g. `https://git.coolcompany.com`
+- `GITEA_CLIENT_ID` - belonging to your [OAuth application](https://docs.gitea.com/development/oauth2-provider)
+- `GITEA_CLIENT_SECRET` - also belonging to your OAuth application
+
+You can create an OAuth application by going to your user/organization's Settings page, then Applications on the left hand side - then you'll find a section called "Manage OAuth2 Applications".
+
+Make sure to point the redirect URI to your Constellation instance, such as `https://constellation.nectarine.sh/gitea/callback` if you've deployed it somewhere or `http://localhost:8000/gitea/callback` if you're running it locally.
+
+Then, when Constellation has started, visit `/gitea/auth` to login to access your releases.
 
 ## Installation
 
@@ -36,16 +50,38 @@ bun install
 ```
 
 ### Docker
+**Note**: You must use either Gitea and GitHub as your asset source. You cannot use both at the same time.
+
+### GitHub
+```yml
+services:
+  constellation:
+    container_name: constellation
+    image: goats2k/constellation:0.3.0
+    restart: unless-stopped
+    environment:
+      - GITHUB_TOKEN=<your-pat-here>
+      - JWT_SECRET_KEY=<your-secret-key-here>
+      - GITEA_SERVER=https://git.nectarine.sh
+      - GITEA_CLIENT_ID=my-fun-client-id-here
+      - GITEA_CLIENT_SECRET=super-secret-client-id
+    ports:
+      - 127.0.0.1:8000:8000
+```
+
+### Gitea
 
 ```yml
 services:
   constellation:
     container_name: constellation
-    image: goats2k/constellation:0.2.0
+    image: goats2k/constellation:0.3.0
     restart: unless-stopped
     environment:
-      - GITHUB_TOKEN=<your-pat-here>
       - JWT_SECRET_KEY=<your-secret-key-here>
+      - GITEA_SERVER=https://git.nectarine.sh
+      - GITEA_CLIENT_ID=my-fun-client-id-here
+      - GITEA_CLIENT_SECRET=super-secret-client-id
     ports:
       - 127.0.0.1:8000:8000
 ```
