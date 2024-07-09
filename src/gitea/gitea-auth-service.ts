@@ -42,7 +42,6 @@ export class GiteaAuthService {
     const clientId = validateEnvironmentVariable("GITEA_CLIENT_ID");
     const clientSecret = validateEnvironmentVariable("GITEA_CLIENT_SECRET");
     const giteaServer = validateEnvironmentVariable("GITEA_SERVER");
-    const redirectUri = validateEnvironmentVariable("GITEA_REDIRECT_URI");
     const requestUrl = `${giteaServer}/login/oauth/access_token`;
 
     const requestBody = {
@@ -50,7 +49,6 @@ export class GiteaAuthService {
       client_secret: clientSecret,
       refresh_token: this.storedCredentials?.refresh_token,
       grant_type: "refresh_token",
-      redirect_uri: redirectUri,
     };
 
     const resp = await fetch(requestUrl, {
