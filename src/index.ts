@@ -19,7 +19,7 @@ const authService = new GiteaAuthService();
 const rs = new ReleaseService();
 
 async function setDownloadUrlForAsset(
-hostUrl: url.URL, releaseAsset: ReleaseAssetDownloadDto, repository: string,
+hostUrl: url.URL, protocol: string, releaseAsset: ReleaseAssetDownloadDto, repository: string,
 ) {
   const currentTime = Math.floor(Date.now() / 1000);
   const releaseSpecificJwt = new SignJWT({repository: repository, platform: releaseAsset.platform, version: releaseAsset.version, arch: releaseAsset.arch})
@@ -34,7 +34,7 @@ hostUrl: url.URL, releaseAsset: ReleaseAssetDownloadDto, repository: string,
   const token = await releaseSpecificJwt.sign(
     new TextEncoder().encode(validateEnvironmentVariable("JWT_SECRET_KEY")),
   );
-  releaseAsset.url = `${hostUrl.protocol}//${hostUrl.host}${releaseAsset.url}?token=${encodeURIComponent(token)}`;
+  releaseAsset.url = `${protocol}//${hostUrl.host}${releaseAsset.url}?token=${encodeURIComponent(token)}`;
 }
 
 const app = new Hono();
@@ -49,7 +49,10 @@ app.get("/gitea/auth", async (c) => {
   const clientId = validateEnvironmentVariable("GITEA_CLIENT_ID");
   
   const hostUrl = new URL(c.req.url);
-  const callbackUri = `${hostUrl.protocol}//${hostUrl.host}/gitea/callback`
+  const proxyProtocol = c.req.header("X-Forwarded-Proto")
+  const protocol = proxyProtocol != null ? `${proxyProtocol}:` : hostUrl.protocol;
+  const callbackUri = `${protocol}//${hostUrl.host}/gitea/callback`
+  console.log("Sending Gitea redirect uri", callbackUri);
 
   const giteaUrl = `${giteaServer}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${callbackUri}&response_type=code&state=`;
   return c.redirect(giteaUrl);
@@ -80,7 +83,9 @@ app.get(
       }
 
       const hostUrl = new URL(c.req.url);
-      const callbackUri = `${hostUrl.protocol}//${hostUrl.host}/gitea/callback`
+      const proxyProtocol = c.req.header("X-Forwarded-Proto")
+      const protocol = proxyProtocol != null ? `${proxyProtocol}:` : hostUrl.protocol;
+      const callbackUri = `${protocol}//${hostUrl.host}/gitea/callback`
 
       await authService.login(code, callbackUri);
       return c.json({
@@ -188,7 +193,9 @@ app.get(
 
       if (release.url.startsWith("/")) {
         const hostUrl = new URL(c.req.url);
-        await setDownloadUrlForAsset(hostUrl, release, payload.repository);
+        const proxyProtocol = c.req.header("X-Forwarded-Proto")
+        const protocol = proxyProtocol != null ? `${proxyProtocol}:` : hostUrl.protocol;
+        await setDownloadUrlForAsset(hostUrl, protocol, release, payload.repository);
       }
       return c.json(release);
     } catch (error) {
