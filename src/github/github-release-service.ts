@@ -140,13 +140,17 @@ export class GithubReleaseService implements IReleaseService {
   private createReleaseAsset(
     asset: components["schemas"]["release-asset"],
   ): ReleaseAssetDto {
-    const filename = path.basename(asset.name, ".zip");
-    const [, version, platform, architecture] = filename.split("-");
+    const filename = path.basename(asset.name!, ".zip");
+    const filenameRegex = /^(.*?)-v(\d+\.\d+(?:\.\d+)?(?:-[a-z]+\.\d+)?)-([^-]+)-([^-]+)$/
+    const match = filename.match(filenameRegex);
+    if (match == null) {
+      throw new Error(`Failed to parse filename: ${filename}`)
+    }
     return {
       id: asset.id,
-      version: version,
-      platform: platform,
-      arch: architecture,
+      version: match[2],
+      platform: match[3],
+      arch: match[4],
       releaseDate: new Date(asset.created_at),
       fileName: asset.name,
       contentLength: asset.size,

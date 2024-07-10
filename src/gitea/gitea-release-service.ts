@@ -147,14 +147,18 @@ export class GiteaReleaseService implements IReleaseService {
 
   createReleaseAsset(asset: Attachment): ReleaseAssetDto {
     const filename = path.basename(asset.name!, ".zip");
-    const [, version, platform, architecture] = filename.split("-");
+    const filenameRegex = /^(.*?)-v(\d+\.\d+(?:\.\d+)?(?:-[a-z]+\.\d+)?)-([^-]+)-([^-]+)$/
+    const match = filename.match(filenameRegex);
+    if (match == null) {
+      throw new Error(`Failed to parse filename: ${filename}`)
+    }
     return {
-      arch: architecture,
+      arch: match[4],
       contentLength: asset.size,
       id: asset.id,
       fileName: asset.name,
-      platform: platform,
-      version: version,
+      platform: match[3],
+      version: match[2],
       releaseDate: new Date(asset.created_at!),
     } as ReleaseAssetDto;
   }
