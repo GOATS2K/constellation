@@ -62,9 +62,6 @@ services:
     environment:
       - GITHUB_TOKEN=<your-pat-here>
       - JWT_SECRET_KEY=<your-secret-key-here>
-      - GITEA_SERVER=https://git.nectarine.sh
-      - GITEA_CLIENT_ID=my-fun-client-id-here
-      - GITEA_CLIENT_SECRET=super-secret-client-id
     ports:
       - 127.0.0.1:8000:8000
 ```
